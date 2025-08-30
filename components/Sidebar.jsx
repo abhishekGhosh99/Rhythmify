@@ -6,14 +6,30 @@ import { Button } from "@/components/ui/button";
 const Sidebar = () => {
   const playlists = [
     { name: "Liked Songs", type: "Playlist • 109 songs", icon: "💜" },
-    { name: "Bengali Playlist", type: "Playlist • Ag", img: "/playlist1.jpg" },
-    { name: "DHH", type: "Playlist • Ag", img: "/playlist2.jpg" },
-    { name: "Mitraz", type: "Artist", img: "/artist1.jpg" },
-    { name: "Mitraz", type: "Artist", img: "/artist1.jpg" },
+    {
+      name: "Bengali Playlist",
+      type: "Playlist • Ag",
+      img: "https://www.shyamh.com/images/blog/music.jpg",
+    },
+    {
+      name: "DHH",
+      type: "Playlist • Ag",
+      img: "https://www.shyamh.com/images/blog/music.jpg",
+    },
+    {
+      name: "Mitraz",
+      type: "Artist",
+      img: "https://www.shyamh.com/images/blog/music.jpg",
+    },
+    {
+      name: "Mitraz",
+      type: "Artist",
+      img: "https://www.shyamh.com/images/blog/music.jpg",
+    },
     {
       name: "Calm Anime Playlist",
       type: "Playlist • Arbiter Ayuna 21",
-      img: "/playlist3.jpg",
+      img: "https://www.shyamh.com/images/blog/music.jpg",
     },
   ];
 

@@ -1,36 +1,39 @@
 "use client";
 
-import { useDispatch } from "react-redux";
-import { setTrack } from "@/store/slices/playerSlice";
-
-const TrackCard = ({ track }) => {
-  const dispatch = useDispatch();
-
-  const handleClick = () => {
-    dispatch(
-      setTrack({
-        title: track.title,
-        artist: track.desc, // ✅ use desc instead of artist_name
-        albumCover: track.img, // ✅ use img instead of image
-        audio: track.audio,
-      })
-    );
+export default function TrackCard({ track, onSelect }) {
+  // Reuse the same truncate helper as in MusicPlayer
+  const truncateText = (text, maxLength = 25) => {
+    if (!text) return "";
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
   };
 
   return (
     <div
-      onClick={handleClick}
-      className="bg-neutral-900 p-3 rounded-xl cursor-pointer hover:bg-neutral-800 transition"
+      className="cursor-pointer rounded-lg shadow-md hover:shadow-lg transition"
+      onClick={() => onSelect(track)}
     >
       <img
-        src={track.img} // ✅ fixed
+        src={track.thumbnail}
         alt={track.title}
-        className="w-full h-40 object-cover rounded-md mb-3"
+        className="rounded-lg w-full h-40 object-cover"
       />
-      <p className="text-sm font-semibold truncate text-white">{track.title}</p>
-      <p className="text-xs text-neutral-400 truncate">{track.desc}</p>
+      <p
+        className="mt-2 text-sm font-semibold text-center truncate px-2"
+        title={track.title} // tooltip with full title
+      >
+        {truncateText(track.title, 30)}
+      </p>
+
+      {track.artist && (
+        <p
+          className="text-xs text-neutral-400 text-center truncate px-2"
+          title={track.artist}
+        >
+          {truncateText(track.artist, 25)}
+        </p>
+      )}
     </div>
   );
-};
-
-export default TrackCard;
+}

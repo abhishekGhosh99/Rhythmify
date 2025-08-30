@@ -1,88 +1,64 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { fetchMusicByCategory } from "@/lib/api";
-import TrackCard from "./TrackCard";
+import TrackCard from "@/components/TrackCard";
+import { useDispatch } from "react-redux";
+import { setTrack } from "@/store/slices/playerSlice";
 
-export default function MainContent() {
-  const [sections, setSections] = useState([]);
-
-  useEffect(() => {
-    async function loadMusic() {
-      try {
-        const pop = await fetchMusicByCategory("pop");
-        const rock = await fetchMusicByCategory("rock");
-
-        setSections([
-          {
-            title: "Pop Hits",
-            items: pop.map((track) => ({
-              id: track.id,
-              title: track.name,
-              desc: track.artist_name,
-              img: track.album_image || "/covers/default.jpg",
-              audio: track.audio,
-            })),
-          },
-          {
-            title: "Rock Hits",
-            items: rock.map((track) => ({
-              id: track.id,
-              title: track.name,
-              desc: track.artist_name,
-              img: track.album_image || "/covers/default.jpg",
-              audio: track.audio,
-            })),
-          },
-        ]);
-      } catch (err) {
-        console.error("Error loading music:", err);
-      }
-    }
-    loadMusic();
-  }, []);
+// Simple category filter component
+function CategoryFilter({ selectedCategory, onSelect }) {
+  const categories = ["All", "Music", "Podcasts", "Hollywood"];
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 rounded-lg mx-0 bg-zinc-800">
-      {/* Filter Buttons */}
-      <div className="flex gap-3 mb-6">
-        <Button variant="secondary" className="rounded-full px-4 py-1">
-          All
-        </Button>
-        <Button
-          variant="ghost"
-          className="rounded-full px-4 py-1 text-white border-[1px] border-white"
+    <div className="flex gap-3 mb-6 flex-wrap">
+      {categories.map((cat) => (
+        <button
+          key={cat}
+          onClick={() => onSelect(cat)}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+            selectedCategory === cat
+              ? "bg-blue-500 text-white"
+              : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+          }`}
         >
-          Music
-        </Button>
-        <Button
-          variant="ghost"
-          className="rounded-full px-4 py-1 text-white border-[1px] border-white"
-        >
-          Podcasts
-        </Button>
-      </div>
-
-      {/* Sections */}
-      {sections.map((section) => (
-        <div key={section.title} className="mb-10">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-white">{section.title}</h2>
-            <button className="flex items-center text-sm text-neutral-400 hover:text-white">
-              Show all <ChevronRight className="w-4 h-4 ml-1" />
-            </button>
-          </div>
-
-          {/* Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {section.items.map((track) => (
-              <TrackCard key={track.id} track={track} />
-            ))}
-          </div>
-        </div>
+          {cat}
+        </button>
       ))}
+    </div>
+  );
+}
+
+export default function MainContent() {
+  const [tracks, setTracks] = useState([]);
+  const [category, setCategory] = useState("Bollywood");
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    fetchMusicByCategory(category).then(setTracks).catch(console.error);
+  }, [category]);
+
+  const handleSelect = (track) => {
+    dispatch(
+      setTrack({
+        id: track.id,
+        title: track.title,
+        albumCover: track.thumbnail,
+        artist: "Unknown Artist", // YouTube doesn’t give artist, can parse from title
+      })
+    );
+  };
+
+  return (
+    <div className="p-6">
+      {/* Category Filter */}
+      <CategoryFilter selectedCategory={category} onSelect={setCategory} />
+
+      {/* Grid of Track Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 text-zinc-300">
+        {tracks.map((track) => (
+          <TrackCard key={track.id} track={track} onSelect={handleSelect} />
+        ))}
+      </div>
     </div>
   );
 }
