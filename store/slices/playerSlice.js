@@ -48,26 +48,11 @@ const playerSlice = createSlice({
     },
 
     setQueue: (state, action) => {
-      // Ensure all tracks have proper default values
-      const sanitizedQueue = action.payload.map((track) => ({
-        id: track.id || `track-${Date.now()}-${Math.random()}`,
-        title: track.title || track.name || "Unknown Song",
-        albumCover:
-          track.albumCover ||
-          track.album_image ||
-          "https://www.shyamh.com/images/blog/music.jpg",
-        artist: track.artist || track.artist_name || "Unknown Artist",
-        duration: track.duration || "0:00",
-        album_name: track.album_name || "Unknown Album",
-      }));
-
-      state.queue = sanitizedQueue;
-      state.originalQueue = sanitizedQueue;
+      state.queue = action.payload;
+      state.originalQueue = action.payload;
       state.currentIndex = 0;
-
-      // Only set currentTrack if queue has items
-      if (sanitizedQueue.length > 0) {
-        state.currentTrack = sanitizedQueue[0];
+      if (action.payload.length > 0) {
+        state.currentTrack = action.payload[0];
       }
     },
 

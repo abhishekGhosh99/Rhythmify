@@ -6,8 +6,8 @@ export const searchSongs = createAsyncThunk(
   "search/searchSongs",
   async (query) => {
     if (!query) return [];
-    const songs = await fetchMusicByCategory(query); // already normalized
-    return songs;
+    const data = await fetchMusicByCategory(query);
+    return data;
   }
 );
 
