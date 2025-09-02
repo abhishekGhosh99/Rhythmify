@@ -38,39 +38,59 @@ const Navbar = () => {
   };
 
   const handleSelectTrack = (track, index) => {
-    console.log("🎵 Track clicked:", track);
+    console.log("Track clicked:", track);
 
-    // Validate track data first
     if (!track) {
-      console.error("❌ Track is null or undefined");
+      console.error("Track is null or undefined");
       return;
     }
 
-    // Create a properly formatted track object with all required fields
+    // Get the best available image URL
+    const getImageUrl = (track) => {
+      // Check multiple possible image properties
+      const possibleImages = [
+        track.album_image,
+        track.albumCover,
+        track.thumbnail,
+        track.snippet?.thumbnails?.medium?.url,
+        track.snippet?.thumbnails?.high?.url,
+        track.snippet?.thumbnails?.default?.url,
+      ];
+
+      // Find the first valid image URL
+      for (const img of possibleImages) {
+        if (img && typeof img === "string" && img.length > 0) {
+          return img;
+        }
+      }
+
+      // If no image found and we have a video ID, use YouTube thumbnail
+      if (track.id) {
+        return `https://img.youtube.com/vi/${track.id}/mqdefault.jpg`;
+      }
+
+      // Final fallback
+      return "https://www.shyamh.com/images/blog/music.jpg";
+    };
+
+    const imageUrl = getImageUrl(track);
+    console.log("Selected image URL:", imageUrl);
+
     const formattedTrack = {
       id: track.id || `track-${Date.now()}`,
       title: track.name || track.title || "Unknown Song",
       artist: track.artist_name || track.artist || "Unknown Artist",
-      albumCover:
-        track.album_image ||
-        track.albumCover ||
-        "https://www.shyamh.com/images/blog/music.jpg",
-      // Add any audio source if available
-      src: track.src || track.audio_url || null,
+      albumCover: imageUrl,
       duration: track.duration || "0:00",
     };
 
-    console.log("🎵 Formatted track:", formattedTrack);
+    console.log("Formatted track:", formattedTrack);
 
     try {
-      // Set the track directly
       dispatch(setTrack(formattedTrack));
-      console.log("✅ Track dispatched successfully");
-
-      // Clear search
       dispatch(clearResults());
     } catch (error) {
-      console.error("❌ Error dispatching track:", error);
+      console.error("Error dispatching track:", error);
     }
   };
 
@@ -147,7 +167,6 @@ const Navbar = () => {
                 </button>
               )}
             </div>
-
             {/* Enhanced Search Results Dropdown */}
             {query && (results.length > 0 || loading) && (
               <div
@@ -168,8 +187,19 @@ const Navbar = () => {
                     </div>
                     <div className="max-h-80 overflow-y-auto">
                       {results.map((track, index) => {
-                        // Debug log to see what data we're getting
-                        console.log("Search result track:", track);
+                        // Debug image data
+                        console.log(`Track ${index} image data:`, {
+                          album_image: track.album_image,
+                          albumCover: track.albumCover,
+                          thumbnail: track.thumbnail,
+                          // Check all possible image properties
+                          allProperties: Object.keys(track).filter(
+                            (key) =>
+                              key.toLowerCase().includes("image") ||
+                              key.toLowerCase().includes("thumb") ||
+                              key.toLowerCase().includes("cover")
+                          ),
+                        });
 
                         return (
                           <div
@@ -177,19 +207,43 @@ const Navbar = () => {
                             onClick={() => handleSelectTrack(track, index)}
                             className="flex items-center gap-3 p-3 hover:bg-neutral-800 cursor-pointer transition-colors border-b border-neutral-800 last:border-b-0 group"
                           >
-                            <img
-                              src={
-                                track.album_image ||
-                                track.albumCover ||
-                                "https://www.shyamh.com/images/blog/music.jpg"
-                              }
-                              alt={track.name || track.title || "Song"}
-                              className="w-12 h-12 rounded-md object-cover flex-shrink-0"
-                              onError={(e) => {
-                                e.target.src =
-                                  "https://www.shyamh.com/images/blog/music.jpg";
-                              }}
-                            />
+                            <div className="relative w-12 h-12 flex-shrink-0">
+                              <img
+                                src={
+                                  track.album_image ||
+                                  track.albumCover ||
+                                  track.thumbnail ||
+                                  track.snippet?.thumbnails?.medium?.url ||
+                                  track.snippet?.thumbnails?.default?.url ||
+                                  `https://img.youtube.com/vi/${track.id}/mqdefault.jpg` || // YouTube thumbnail
+                                  "https://www.shyamh.com/images/blog/music.jpg"
+                                }
+                                alt={track.name || track.title || "Song"}
+                                className="w-12 h-12 rounded-md object-cover"
+                                onError={(e) => {
+                                  console.log(
+                                    `Image failed for track ${track.name}:`,
+                                    e.target.src
+                                  );
+                                  // Try YouTube thumbnail as backup
+                                  if (
+                                    !e.target.src.includes("img.youtube.com") &&
+                                    track.id
+                                  ) {
+                                    e.target.src = `https://img.youtube.com/vi/${track.id}/mqdefault.jpg`;
+                                  } else {
+                                    e.target.src =
+                                      "https://www.shyamh.com/images/blog/music.jpg";
+                                  }
+                                }}
+                                onLoad={(e) => {
+                                  console.log(
+                                    `Image loaded successfully for ${track.name}:`,
+                                    e.target.src
+                                  );
+                                }}
+                              />
+                            </div>
                             <div className="flex-1 min-w-0">
                               <p
                                 className="text-sm font-medium truncate text-white"

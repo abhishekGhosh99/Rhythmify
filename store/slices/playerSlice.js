@@ -42,8 +42,26 @@ const playerSlice = createSlice({
       state.volume = action.payload;
     },
 
+    // Replace your setTrack reducer with this safer version
     setTrack: (state, action) => {
-      state.currentTrack = action.payload;
+      const track = action.payload;
+
+      // Validate and sanitize the track data
+      const sanitizedTrack = {
+        id: track?.id || `track-${Date.now()}`,
+        title: track?.title || track?.name || "Unknown Song",
+        artist: track?.artist || track?.artist_name || "Unknown Artist",
+        albumCover:
+          track?.albumCover ||
+          track?.album_image ||
+          "https://www.shyamh.com/images/blog/music.jpg",
+        src: track?.src || track?.audio_url || null,
+        duration: track?.duration || "0:00",
+      };
+
+      console.log("🎵 Setting track in Redux:", sanitizedTrack);
+
+      state.currentTrack = sanitizedTrack;
       state.isPlaying = true; // auto play when track changes
     },
 
