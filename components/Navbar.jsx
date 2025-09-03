@@ -301,8 +301,13 @@ const Navbar = () => {
           Explore Premium
         </Button>
         <div className="flex items-center gap-4 text-neutral-300">
-          <Download className="w-5 h-5" />
-          <span className="text-sm">Install App</span>
+          <Link
+            href="/download"
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            <Download className="w-5 h-5" />
+            <span className="text-sm">Install App</span>
+          </Link>
           <Bell className="w-5 h-5" />
           <Users className="w-5 h-5" />
         </div>
