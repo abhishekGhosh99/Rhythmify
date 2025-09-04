@@ -13,7 +13,7 @@ export default function DownloadPage() {
           {/* Rhythmify Logo */}
           <div className="flex items-center gap-2">
             <Image
-              src="/white_logo_transparent1.svg" // your Rhythmify logo
+              src="/white_logo_transparent1.svg"
               alt="Rhythmify Logo"
               width={160}
               height={50}

@@ -297,9 +297,14 @@ const Navbar = () => {
 
       {/* Right Section */}
       <div className="flex items-center gap-5">
-        <Button className="rounded-full bg-white text-black px-4 py-1 font-semibold hover:bg-neutral-200">
-          Explore Premium
-        </Button>
+        <Link href="/premium" passHref>
+          <Button
+            asChild
+            className="rounded-full bg-white text-black px-4 py-1 font-semibold hover:bg-neutral-200"
+          >
+            <span>Explore Premium</span>
+          </Button>
+        </Link>
         <div className="flex items-center gap-4 text-neutral-300">
           <Link
             href="/download"
